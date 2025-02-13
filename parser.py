@@ -1,8 +1,7 @@
-
-
 import requests
 
-def parser(items):
+
+def parser_price(items):
     headers = {
         'accept': '*/*',
         'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
@@ -24,6 +23,7 @@ def parser(items):
         f'https://card.wb.ru/cards/v2/detail?appType=1&curr=byn&dest=-59202&hide_dtype=10&spp=30&ab_testing=false&nm={items}',
         headers=headers,
     )
+
     res = response.json()
     amount = res['data']['products'][0]['sizes'][0]['price']['total']
 
@@ -34,14 +34,33 @@ def parser(items):
     # Форматирование строки
     formatted_amount = f"{rubles},{kopecks:02d} руб"  # Используем :02d для добавления ведущего нуля, если нужно
 
-    print(type(res))
-    print(formatted_amount)
     return formatted_amount
 
 
-print(parser(293859675))
+def parser_body(items_body):
+    headers = {
+        'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+        'Referer': 'https://www.wildberries.by/catalog/293859675/detail.aspx',
+        'sec-ch-ua-mobile': '?1',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+        'sec-ch-ua-platform': '"Android"',
+    }
+
+    items_body = str(items_body)
+
+    for url in range(1, 20):
+        try:
+            formatted_value = f"{url:02d}"
+            link = f'https://basket-{formatted_value}.wbbasket.ru/vol{items_body[:-5]}/part{items_body[:-3]}/{items_body}/info/ru/card.json'
+            response = requests.get(link, headers=headers)
+            print(link)
+            if response.status_code == 200 or response.status_code == 201:
+                print('201')
+                return response.json()
+
+        except:
+            print('no')
 
 
-
-
-
+'60407528' 'https://basket-04.wbbasket.ru/vol604/part60407/60407528/info/ru/card.json'
+'146341459' 'https://basket-10.wbbasket.ru/vol1463/part146341/146341459/info/ru/card.json'
